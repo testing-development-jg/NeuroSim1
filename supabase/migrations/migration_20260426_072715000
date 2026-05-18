@@ -1,0 +1,59 @@
+
+-- Surgical sessions table
+CREATE TABLE IF NOT EXISTS public.surgical_sessions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id text NOT NULL UNIQUE,
+  user_id text NOT NULL,
+  user_name text,
+  user_email text,
+  specialty text DEFAULT 'Neurosurgery',
+  steps_completed integer DEFAULT 0,
+  score integer DEFAULT 0,
+  total_time_seconds integer,
+  completed boolean DEFAULT false,
+  created_at timestamptz DEFAULT now(),
+  completed_at timestamptz
+);
+
+-- Analytics events table
+CREATE TABLE IF NOT EXISTS public.surgical_analytics (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  session_id text NOT NULL,
+  user_id text,
+  event_type text NOT NULL,
+  step_number integer,
+  tool_used text,
+  event_timestamp timestamptz DEFAULT now(),
+  metadata jsonb DEFAULT '{}'::jsonb
+);
+
+-- User leaderboard view
+CREATE OR REPLACE VIEW public.leaderboard AS
+  SELECT 
+    user_id,
+    user_name,
+    specialty,
+    COUNT(*) as total_sessions,
+    MAX(score) as best_score,
+    AVG(score)::integer as avg_score,
+    SUM(CASE WHEN completed THEN 1 ELSE 0 END) as completed_sessions
+  FROM public.surgical_sessions
+  GROUP BY user_id, user_name, specialty
+  ORDER BY best_score DESC;
+
+-- Enable RLS
+ALTER TABLE public.surgical_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.surgical_analytics ENABLE ROW LEVEL SECURITY;
+
+-- Allow all authenticated writes (Edge Function service role bypasses RLS)
+CREATE POLICY "Allow service role all access on sessions"
+  ON public.surgical_sessions
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+CREATE POLICY "Allow service role all access on analytics"
+  ON public.surgical_analytics
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
