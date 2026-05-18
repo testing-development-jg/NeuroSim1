@@ -6,7 +6,7 @@
 @layer base {
   :root {
     /* Dark surgical operating room theme */
-    --background: 220 25% 4%;
+    --background: 0 0% 0%;
     --foreground: 200 20% 90%;
 
     --card: 220 22% 7%;
@@ -50,7 +50,7 @@
     --blood-red: 0 80% 45%;
 
     /* Gradients */
-    --gradient-surgical: linear-gradient(135deg, hsl(220 25% 4%), hsl(220 30% 8%));
+    --gradient-surgical: linear-gradient(135deg, #000000 0%, #0f172a 50%, #020617 100%);
     --gradient-panel: linear-gradient(180deg, hsl(220 22% 8%), hsl(220 22% 6%));
     --gradient-primary: linear-gradient(135deg, hsl(142 70% 45%), hsl(160 65% 40%));
     --gradient-danger: linear-gradient(135deg, hsl(0 75% 55%), hsl(20 80% 50%));
@@ -81,8 +81,10 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #000000 0%, #0f172a 50%, #020617 100%);
+    min-height: 100vh;
   }
 }
 
@@ -92,6 +94,8 @@ body,
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: linear-gradient(135deg, #000000 0%, #0f172a 50%, #020617 100%);
+  background-attachment: fixed;
 }
 
 /* Surgical HUD scrollbar */
